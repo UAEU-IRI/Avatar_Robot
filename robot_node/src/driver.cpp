@@ -1,6 +1,5 @@
 #include "ros/ros.h"
 #include "Dynamixle.h"
-#include "myheader.h"
 #include <robot_state_publisher/robot_state_publisher.h>
 #include <kdl_parser/kdl_parser.hpp>
 #include "sensor_msgs/JointState.h"
@@ -149,6 +148,7 @@ pub.publish(feedback_data);
 
 //check if joint commands are received
 if(data.header.seq>0){
+std::cout<< data.position[0] << std::endl;
 servo.writePosition(data.position[0],data.position[1],data.position[2],data.position[3],data.position[4]);
 }//end if
 

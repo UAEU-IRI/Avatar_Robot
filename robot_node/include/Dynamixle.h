@@ -24,9 +24,6 @@ using namespace std;
 #define	ALL				0xFE
 #define TIMEOUT .05
 
-
-
-
 // Macros
 #define deg2rad(x) x*3.14159265359/180.0
 #define rad2deg(x) x*180.0/3.14159265359

@@ -157,7 +157,7 @@ float Dynamixle::readPosition(int ID){
 			try{_checksum=Dynamixle::readByte();}catch(int msg){std::cout<< "ID: " << ID <<std::endl; throw "Connection timeout";} 
 			unsigned char __checksum=~(_ID+length+error+data[0]+data[1]);
 			if(__checksum==_checksum && error==0){
-			angle=((data[1]<<8)+data[0])*300.0/1021.0;
+			angle=((data[1]<<8)+data[0])*360.0/4095.0;
 			} else{throw "invalid message";}
 			} else{throw "invalid message";}
 			} else{throw "invalid message";}
@@ -169,39 +169,39 @@ float Dynamixle::readPosition(int ID){
 			}
 			
 void Dynamixle::writePosition(float angle1,float angle2,float angle3,float angle4,float angle5){
-			int value1=int(rad2deg(angle1)*3.41);  //3.41 is the conversion from angles to register value. for example; 1023 represents 300 degrees, 0 is 0 degree...
-			int value2=int(rad2deg(angle2)*3.41);
-			int value3=int(rad2deg(angle3)*3.41);
-			int value4=int(rad2deg(angle4)*3.41);
-			int value5=int(rad2deg(angle5)*3.41);
-			
+			int value1=int(rad2deg(angle1)/0.088);  //11.375 is the conversion from angles to register value. for example; 1023 represents 300 degrees, 0 is 0 degree...
+			int value2=int(rad2deg(angle2)/0.088);
+			int value3=int(rad2deg(angle3)/0.088);
+			int value4=int(rad2deg(angle4)/0.088);
+			int value5=int(rad2deg(angle5)/0.088);
+			                                              // Float Angle (H + A + B + L)
 			unsigned char angle1_L=value1;
 			unsigned char angle2_L=value2;
 			unsigned char angle3_L=value3;
 			unsigned char angle4_L=value4;
 			unsigned char angle5_L=value5;
-			
+
 			unsigned char angle1_H=(value1>>8);
 			unsigned char angle2_H=(value2>>8);
 			unsigned char angle3_H=(value3>>8);
 			unsigned char angle4_H=(value4>>8);
 			unsigned char angle5_H=(value5>>8);
-			unsigned char checksum = ~(ALL + 19 + 0x83 + 0x1E + 2 + R_SHOULDER_1 + angle1_L + angle1_H
-																  + R_SHOULDER_2 + angle2_L + angle2_H
-																  + R_SHOULDER_3 + angle3_L + angle3_H
-																  + R_ELBOW      + angle4_L + angle4_H
-																  + R_LOWER      + angle5_L + angle5_H);
+			unsigned char checksum = ~(ALL + 29 + 0x83 + 116 + 2 + R_SHOULDER_1 + angle1_L + angle1_H
+									      + R_SHOULDER_2 + angle2_L + angle2_H
+									      + R_SHOULDER_3 + angle3_L + angle3_H
+									      + R_ELBOW      + angle4_L + angle4_H
+									      + R_LOWER      + angle5_L + angle5_H);
 			
 			
 			
 			
-			~(ALL+19+0x83+ 0x1E + 2  +R_SHOULDER_1+angle1_L+angle1_H+R_SHOULDER_2+angle2_L+angle2_H+R_ELBOW+angle4_L+angle4_H+R_LOWER+angle5_L+angle5_H);
-			char output_buffer[23] ={0xFF,0xFF,ALL,19,0x83, 0x1E, 2 ,R_SHOULDER_1,angle1_L,angle1_H,
-																  R_SHOULDER_2,angle2_L,angle2_H,
-																  R_SHOULDER_3,angle3_L,angle3_H,
-																  R_ELBOW,angle4_L,angle4_H,
-																  R_LOWER,angle5_L,angle5_H,checksum};
-			Serial.write( output_buffer,23);
+			~(ALL+29+0x83+ 116 + 2  +R_SHOULDER_1+angle1_L+angle1_H+R_SHOULDER_2+angle2_L+angle2_H+R_ELBOW+angle4_L+angle4_H+R_LOWER+angle5_L+angle5_H);
+			char output_buffer[33] ={0xFF,0xFF,ALL,29,0x83, 116 , 4 ,R_SHOULDER_1 , angle1_L , angle1_H, 0x00 , 0x00 ,
+										 R_SHOULDER_2 , angle2_L , angle2_H, 0x00 , 0x00 ,
+										 R_SHOULDER_3 , angle3_L , angle3_H, 0x00 , 0x00 ,
+										 R_ELBOW , angle4_L , angle4_H, 0x00 , 0x00 ,
+										 R_LOWER , angle5_L , angle5_H , 0x00 , 0x00 , checksum};
+			Serial.write( output_buffer,33);
 			}//end writePosition
 
 
@@ -209,13 +209,13 @@ void Dynamixle::writePosition(float angle1,float angle2,float angle3,float angle
 
 
 void Dynamixle::writePosition(int ID,float angle){
-			int value=int(rad2deg(angle)*3.41);  //3.41 is the conversion from angles to register value. for example; 1023 represents 300 degrees, 0 is 0 degree...
+			int value=int(rad2deg(angle)*11.375);  //11.375 is the conversion from angles to register value. for example; 1023 represents 300 degrees, 0 is 0 degree...
 
 			char angle_L=value;
 			char angle_H=(value>>8);
 	
-			unsigned char checksum=~(ID+0x05+0x03+ 0x1E +angle_L+angle_H);
-			char output_buffer[9] ={0xFF,0xFF,ID,0x05,0x03, 0x1E ,angle_L,angle_H,checksum};
+			unsigned char checksum=~(ID+0x05+0x03+ 116 +angle_L+angle_H);
+			char output_buffer[11] ={0xFF,0xFF,ID,0x07,0x03, 116 ,angle_L,angle_H,0x00, 0x00,checksum};
 			Serial.write( output_buffer,9);
 			
 			if (ID !=ALL){

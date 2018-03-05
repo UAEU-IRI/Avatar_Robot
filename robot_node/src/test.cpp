@@ -52,7 +52,7 @@ ros::Subscriber sub_joints= nh.subscribe(ns+"/joint_cmd", 100 ,callBack);
 
 while (ros::ok()){
 
-//servo.writePosition(20,angle);
+servo.LED(20,angle);
 
 angle+=0.02;
 if(angle>4){angle=0.;}
