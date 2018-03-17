@@ -41,6 +41,8 @@ class Dynamixle
 		SerialStream Serial;
 		clock_t init;
 		bool cond;
+		float accLimit;
+		float velLimit;
 		void setSpeed(int ID,float speed);
 		void setDelayTime(int ID,unsigned int usec);
 		unsigned short update_crc(unsigned short crc_accum, unsigned char *data_blk_ptr, unsigned short data_blk_size);
@@ -54,6 +56,10 @@ class Dynamixle
 		float readPosition(int ID);
 		void config(float speed,bool trqEnb);
 		void torqueEnable(int ID,bool state);
+		void setAccLimit(int ID,float acc);
+		void setAcc(int ID,float acc);
+		void setVelLimit(int ID,float velL);
+		void setVel(int ID,float vel);
 			
 };
 

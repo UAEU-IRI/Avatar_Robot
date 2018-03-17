@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 //feedback_data.name.assign(m);
 ros::init(argc, argv, "test_driver");
 ros::NodeHandle nh;
-ros::Rate rate(0.5);
+ros::Rate rate(300);
 std::string ns;
 ns=ros::this_node::getName();
 
@@ -46,16 +46,21 @@ ns=ros::this_node::getName();
 
 
 ros::Subscriber sub_joints= nh.subscribe(ns+"/joint_cmd", 100 ,callBack);	
-float deg=2.40;
+float deg=2;
+float deg2=-3;
 bool stat=true;
 servo.torqueEnable(ALL,true);
 while (ros::ok()){
 
 servo.LED(R_SHOULDER_1,stat);
+servo.LED(R_SHOULDER_2,stat);
+servo.LED(R_SHOULDER_3,stat);
 stat=!stat;
 std::cout<<"LED Blinking"<<std::endl;
-deg = deg + 0.05;
+deg = deg + 0.005;
 servo.writePosition(R_SHOULDER_1,deg);
+servo.writePosition(R_SHOULDER_2,deg);
+servo.writePosition(R_SHOULDER_3,deg);
 
 
 ros::spinOnce();

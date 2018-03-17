@@ -84,7 +84,7 @@ float shoulder_shoulder_left;
 float shoulder_upperArm_left;
 float upperArm_midArm_left;
 
-servo.config(30.0,false);
+servo.config(30.0,true);
 
 while (ros::ok()){
 
