@@ -1,6 +1,5 @@
 #include "ros/ros.h"
 #include "Dynamixle.h"
-#include "myheader.h"
 #include <robot_state_publisher/robot_state_publisher.h>
 #include <kdl_parser/kdl_parser.hpp>
 #include "sensor_msgs/JointState.h"
