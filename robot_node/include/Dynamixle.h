@@ -46,6 +46,12 @@ class Dynamixle
 		void setSpeed(int ID,float speed);
 		void setDelayTime(int ID,unsigned int usec);
 		unsigned short update_crc(unsigned short crc_accum, unsigned char *data_blk_ptr, unsigned short data_blk_size);
+		float bytes2float(unsigned char b1,unsigned char b2,unsigned char b3,unsigned char b4);
+		
+		union {
+		  float f;
+		  unsigned long l;
+		} u;
 		
 	public:
 		
@@ -54,6 +60,7 @@ class Dynamixle
 		void writePosition(float angle1,float angle2,float angle3,float angle4,float angle5);
 		void writePosition(int ID,float angle);
 		float readPosition(int ID);
+		void readPosition(float *angles_array);
 		void config(float speed,bool trqEnb);
 		void torqueEnable(int ID,bool state);
 		void setAccLimit(int ID,float acc);

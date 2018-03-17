@@ -42,6 +42,12 @@ unsigned char Dynamixle::readByte(){
               if (cond==true){Serial.readsome(next_char,1); return next_char[0];}
                 else{throw -1;}
                                    } //End of Dynamixle::readByte
+                                   
+                                   
+float Dynamixle::bytes2float(unsigned char b1,unsigned char b2,unsigned char b3,unsigned char b4){
+Dynamixle::u.l=b1+(b2<<8)+(b3<<16)+(b4<<24);
+return Dynamixle::u.f;
+}
 //-------------------------------------------------------------------------------------------------------------------------------------						
 unsigned short Dynamixle::update_crc(unsigned short crc_accum, unsigned char *data_blk_ptr, unsigned short data_blk_size)
 {
@@ -210,8 +216,11 @@ float Dynamixle::readPosition(int ID){
 			}
 			
 
-float Dynamixle::readPosition(){
-
+void Dynamixle::readPosition(float *angles_array){
+			//angles_array is a float array storing the following angles with the same order:
+			//R_SHOULDER_1 , R_SHOULDER_2 , R_SHOULDER_3 , R_ELBOW , R_LOWER
+			
+			
 			unsigned char packet[17]= {0xFF,0xFF,0xFD,0x00,0xFE,12,0,0x82,132,0,4,0,
 									   R_SHOULDER_1 , R_SHOULDER_2 , R_SHOULDER_3 , R_ELBOW , R_LOWER };
 			
@@ -222,7 +231,18 @@ float Dynamixle::readPosition(){
 									   R_SHOULDER_1 , R_SHOULDER_2 , R_SHOULDER_3 , R_ELBOW , R_LOWER,crc_L,crc_H };
 			Serial.write( output_buffer,19);
 			
-			unsigned char _ID,_lengthH,_lengthL,_instruct,pos_1,pos_2,pos_3,pos_4,_error,_checksum,_framing1,_framing2,_framing3;
+			unsigned char pos_1,pos_2,pos_3,pos_4,_framing1,_framing2,_framing3;
+			
+			float _angle;
+			
+			unsigned char _packet[15];
+			_packet[0]=0xFF;
+			_packet[1]=0xFF;
+			_packet[2]=0xFD;
+			_packet[3]=0x00;
+			
+			
+			for( int j=1;j<=5;j++){
 			
 			
 			try{_framing1=Dynamixle::readByte();} catch(int msg){throw "Connection timeout";}
@@ -232,11 +252,48 @@ float Dynamixle::readPosition(){
 			
 			if(_framing1==0xFF && _framing2==0xFF && _framing3==0xFD){
 			
-			try{_ID=Dynamixle::readByte();} catch(int msg){throw "Connection timeout";}
 			
-			   }
+			for (int i=4;i<15;i++){
+			try{_packet[i]=Dynamixle::readByte();} catch(int msg){throw "Connection timeout";}
+			 }//for loop
+			 unsigned short _crc = Dynamixle::update_crc(0,_packet,13);
+			 unsigned short _msg_crc=_packet[13]+(_packet[14]<<8);
+			 
+			 
+			 if(_crc==_msg_crc && _packet[8]==0){
+			 				
+			 				_angle=Dynamixle::bytes2float(_packet[12],_packet[11],_packet[10],_packet[9]);
+			 				
+							switch(_packet[4]) {
+
+						   case R_SHOULDER_1:
+							  angles_array[0]=_angle;
+							  break; 
+
+						   case R_SHOULDER_2:
+							  angles_array[1]=_angle;
+							  break; 
+
+						   case R_SHOULDER_3:
+							  angles_array[2]=_angle;
+							  break; 
+							  
+						   case R_ELBOW:
+							  angles_array[3]=_angle;
+							  break; 
+							  
+							  
+						   case R_LOWER:
+							  angles_array[4]=_angle;
+							  break; 							  							  						  
+
+							}//switch
+			 }//if(_crc ..			 
+			 }//if(_framing1==0xFF &..
+			 }//for loop five times 
+		
 									   
-}
+}//funcion end
 			
 void Dynamixle::writePosition(float angle1,float angle2,float angle3,float angle4,float angle5){    //Write Position fpr ALL Protocol (2.0)
 			int value1=int(rad2deg(angle1)/0.088);  //11.375 is the conversion from angles to register value. for example; 1023 represents 300 degrees, 0 is 0 degree...
