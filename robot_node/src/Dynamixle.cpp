@@ -185,6 +185,7 @@ void Dynamixle::torqueEnable(int ID,bool state){    //Set Torque Status Protocol
 			}//end torqueEnable
 			
 float Dynamixle::readPosition(int ID){
+			
 			unsigned char data[2];
 			float angle;
 			while (Serial.rdbuf()->in_avail()){Serial.get();} //clears input buffer
@@ -220,6 +221,7 @@ void Dynamixle::readPosition(float *angles_array){
 			//angles_array is a float array storing the following angles with the same order:
 			//R_SHOULDER_1 , R_SHOULDER_2 , R_SHOULDER_3 , R_ELBOW , R_LOWER
 			
+			while (Serial.rdbuf()->in_avail()){Serial.get();} //clears input buffer
 			
 			unsigned char packet[17]= {0xFF,0xFF,0xFD,0x00,0xFE,12,0,0x82,132,0,4,0,
 									   R_SHOULDER_1 , R_SHOULDER_2 , R_SHOULDER_3 , R_ELBOW , R_LOWER };
@@ -262,7 +264,7 @@ void Dynamixle::readPosition(float *angles_array){
 			 
 			 if(_crc==_msg_crc && _packet[8]==0){
 			 				
-			 				_angle=Dynamixle::bytes2float(_packet[12],_packet[11],_packet[10],_packet[9]);
+			 				_angle=float((_packet[10]<<8)+_packet[9])/11.375;
 			 				
 							switch(_packet[4]) {
 

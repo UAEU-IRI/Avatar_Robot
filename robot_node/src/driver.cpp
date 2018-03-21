@@ -85,11 +85,18 @@ float shoulder_upperArm_left;
 float upperArm_midArm_left;
 
 servo.config(30.0,true);
+float angs[5]={0.0,0.0,0.0,0.0,0.0};
 
 while (ros::ok()){
 
 
 //read joint angles from motor
+try {servo.readPosition(angs);}		catch (const char* msg){std::cerr << msg << std::endl;}
+neck_base_shoulder_right=angs[0];
+shoulder_shoulder_right=angs[1];
+shoulder_upperArm_right=angs[2];
+upperArm_midArm_right=angs[3];
+cout << angs[0] << "    "<< angs[1] << "    "<< angs[2] << "    "<< angs[3] << "    "<< angs[4] << "    " << endl;
 /*
 try {neck_base_shoulder_right=servo.readPosition(R_SHOULDER_1);}
 catch (const char* msg){std::cerr << msg << std::endl;}
@@ -145,6 +152,7 @@ feedback_data.position.push_back(deg2rad(shoulder_shoulder_left));
 feedback_data.position.push_back(deg2rad(shoulder_upperArm_left));
 feedback_data.position.push_back(deg2rad(upperArm_midArm_left));
 pub.publish(feedback_data);
+
 
 //check if joint commands are received
 if(data.header.seq>0){
